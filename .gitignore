@@ -1,0 +1,39 @@
+# Python + Data Science .gitignore
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment folders
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Data folders (optional – raw/processed data)
+data/raw/
+data/processed/
+*.csv
+*.json
+*.db
+
+# Model files
+models/*.pkl
+models/*.joblib
+
+# Logs
+*.log
+
+# Environment / secret keys
+.env
+*.env
+credentials.json
+apikeys.json
+
+# Cache / temporary fil
