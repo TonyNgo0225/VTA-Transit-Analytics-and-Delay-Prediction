@@ -1,11 +1,27 @@
-# Python + Data Science .gitignore
+"""
+.gitignore
+-----------
+Author: Tony Ngo
+
+Description:
+    This file tells Git which files and folders to ignore when uploading to GitHub. 
+    It protects sensitive information (like API keys), large data files, and 
+    temporary system files from being shared publicly.
+
+This:
+    Hides API keys and environment variables.
+    Keeps large data and model files out of the repository.
+    Ignores cache, system, and log files that clutter version control.
+"""
 
 # Byte-compiled / optimized / DLL files
+
 __pycache__/
 *.py[cod]
 *$py.class
 
 # Virtual environment folders
+
 .venv/
 env/
 venv/
@@ -14,26 +30,11 @@ env.bak/
 venv.bak/
 
 # Jupyter Notebook checkpoints
-.ipynb_checkpoints
 
-# Data folders (optional – raw/processed data)
+.ipynb_checkpoints/
+
+# Data folders (keeps code lightweight on GitHub)
+
 data/raw/
 data/processed/
 *.csv
-*.json
-*.db
-
-# Model files
-models/*.pkl
-models/*.joblib
-
-# Logs
-*.log
-
-# Environment / secret keys
-.env
-*.env
-credentials.json
-apikeys.json
-
-# Cache / temporary fil
