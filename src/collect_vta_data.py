@@ -4,7 +4,7 @@ collect_vta_data.py
 Author: Tony Ngo
 
 Description:
-    This script connects to the VTA (Valley Transportation Authority) real-time API 
+    This script connects to the VTA (Valley Transportation Authority) real time API 
     using data provided by 511.org. It downloads live information about bus and 
     light rail vehicle locations in Santa Clara County.
 
@@ -24,23 +24,28 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Load API key from environment variables
+
 load_dotenv()
 VTA_API_KEY = os.getenv("VTA_API_KEY")
 
 # Create data directory if it doesn’t exist
+
 os.makedirs("data/raw", exist_ok=True)
 
-# 511.org provides real-time transit data for VTA
+# 511.org provides real time transit data for VTA
 # Documentation: https://511.org/open-data/transit
+
 VTA_API_URL = f"https://api.511.org/transit/vehiclepositions?api_key={VTA_API_KEY}&agency=SCVTA"
 
 
 def fetch_vta_data():
+    
     """
     Fetches live VTA vehicle position data from the 511.org API.
     Returns a Pandas DataFrame if JSON data is available, 
-    or saves a binary .pb file if GTFS-realtime format is returned.
+    or saves a binary .pb file if GTFS realtime format is returned.
     """
+    
     try:
         response = requests.get(VTA_API_URL, timeout=10)
         response.raise_for_status()
@@ -49,14 +54,17 @@ def fetch_vta_data():
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         if "application/json" in content_type:
+            
             # Parse JSON data into a flat table
+            
             data = response.json()
             df = pd.json_normalize(data.get("entity", []))
             print(f"✅ Successfully fetched {len(df)} records from VTA API.")
             return df
 
         else:
-            # Save raw GTFS-realtime protobuf if JSON is unavailable
+            # Save raw GTFS realtime protobuf if JSON is unavailable
+            
             raw_filename = f"data/raw/vta_raw_{timestamp}.pb"
             with open(raw_filename, "wb") as f:
                 f.write(response.content)
@@ -72,10 +80,12 @@ def fetch_vta_data():
 
 
 def save_vta_data(df):
+    
     """
     Saves the fetched DataFrame to a CSV file under data/raw/.
     Automatically timestamps each saved file.
     """
+    
     if df is not None and not df.empty:
         filename = f"data/raw/vta_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
         df.to_csv(filename, index=False)
