@@ -1,111 +1,91 @@
+"""
+collect_vta_data.py
+-------------------
+Author: Tony Ngo
+
+Description:
+    This script connects to the VTA (Valley Transportation Authority) real-time API 
+    using data provided by 511.org. It downloads live information about bus and 
+    light rail vehicle locations in Santa Clara County.
+
+This program:
+    Connects to the VTA API using your personal API key.
+    Collects the latest transit data.
+    Saves the data into the "data/raw" folder for later analysis.
+
+    The data will help build models that can predict bus or train delays later on.
+"""
+
+
+import os
 import requests
 import pandas as pd
-import time
 from datetime import datetime
-import os
-
-# Optionally, load environment variables (if you use API keys, etc.)
 from dotenv import load_dotenv
+
+# Load API key from environment variables
 load_dotenv()
+VTA_API_KEY = os.getenv("VTA_API_KEY")
 
-# ========== Configuration ==========
-# These may need to change depending on the actual API spec
-RTVIP_BASE = "https://rtvip.vta.org/api/fetch"  # base for RTVIP requests :contentReference[oaicite:1]{index=1}
-FETCH_TYPE = "vehicle_positions"  # example type — check API docs
-RECORD_COUNT = 1000  # how many records to request
-ORDER = "desc"
-COUNTER = 0
+# Create data directory if it doesn’t exist
+os.makedirs("data/raw", exist_ok=True)
 
-OUTPUT_DIR = "data/raw"
-OUTPUT_CSV = os.path.join(OUTPUT_DIR, "vta_realtime_snapshot.csv")
-
-# Create directory if not exists
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+# 511.org provides real-time transit data for VTA
+# Documentation: https://511.org/open-data/transit
+VTA_API_URL = f"https://api.511.org/transit/vehiclepositions?api_key={VTA_API_KEY}&agency=SCVTA"
 
 
-def build_url(fetch_type=FETCH_TYPE, count=RECORD_COUNT, order=ORDER, counter=COUNTER):
+def fetch_vta_data():
     """
-    Build the RTVIP API URL for fetching real-time data.
-    Format based on VTA API docs: /api/fetch/{type}/{count}/{order}/{counter} :contentReference[oaicite:2]{index=2}
+    Fetches live VTA vehicle position data from the 511.org API.
+    Returns a Pandas DataFrame if JSON data is available, 
+    or saves a binary .pb file if GTFS-realtime format is returned.
     """
-    url = f"{RTVIP_BASE}/{fetch_type}/{count}/{order}/{counter}"
-    return url
+    try:
+        response = requests.get(VTA_API_URL, timeout=10)
+        response.raise_for_status()
+
+        content_type = response.headers.get("Content-Type", "")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        if "application/json" in content_type:
+            # Parse JSON data into a flat table
+            data = response.json()
+            df = pd.json_normalize(data.get("entity", []))
+            print(f"✅ Successfully fetched {len(df)} records from VTA API.")
+            return df
+
+        else:
+            # Save raw GTFS-realtime protobuf if JSON is unavailable
+            raw_filename = f"data/raw/vta_raw_{timestamp}.pb"
+            with open(raw_filename, "wb") as f:
+                f.write(response.content)
+            print(f"💾 Saved raw GTFS-realtime data as {raw_filename}")
+            return None
+
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Network/API error: {e}")
+        return None
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+        return None
 
 
-def fetch_vta_realtime():
-    url = build_url()
-    resp = requests.get(url)
-    resp.raise_for_status()
-    # The response might be JSON or XML depending on the API.
-    # We'll assume JSON for now — you’ll adjust if it’s XML.
-    return resp.json()
-
-
-def parse_vehicle_data(json_data):
+def save_vta_data(df):
     """
-    Parse JSON response into a DataFrame.
-    You’ll need to adjust field names based on the API structure.
+    Saves the fetched DataFrame to a CSV file under data/raw/.
+    Automatically timestamps each saved file.
     """
-    records = []
-    entities = json_data.get("entity", [])
-    for ent in entities:
-        # some APIs wrap vehicle info under “vehicle” key, etc.
-        veh = ent.get("vehicle", {})
-        trip = veh.get("trip", {})
-        pos = veh.get("position", {})
-        rec = {
-            "entity_id": ent.get("id"),
-            "trip_id": trip.get("trip_id"),
-            "route_id": trip.get("route_id"),
-            "direction_id": trip.get("direction_id"),
-            "latitude": pos.get("latitude"),
-            "longitude": pos.get("longitude"),
-            "timestamp": veh.get("timestamp") or ent.get("timestamp"),
-        }
-        # convert timestamp to datetime, if present
-        if rec["timestamp"] is not None:
-            try:
-                rec["datetime"] = datetime.fromtimestamp(int(rec["timestamp"]))
-            except Exception as e:
-                rec["datetime"] = None
-        records.append(rec)
-    df = pd.DataFrame(records)
-    return df
-
-
-def save_snapshot(df, output_csv=OUTPUT_CSV):
-    """
-    Save the DataFrame to CSV (appending with timestamp).
-    """
-    # If file doesn't exist, write header; else append
-    if not os.path.isfile(output_csv):
-        df.to_csv(output_csv, index=False)
+    if df is not None and not df.empty:
+        filename = f"data/raw/vta_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        df.to_csv(filename, index=False)
+        print(f"📁 Data saved to {filename}")
     else:
-        df.to_csv(output_csv, mode="a", header=False, index=False)
-
-
-def main(poll_interval_s=60):
-    """
-    Continuously fetch and append live data every poll_interval_s seconds.
-    """
-    while True:
-        try:
-            json_data = fetch_vta_realtime()
-            df = parse_vehicle_data(json_data)
-            print(f"[{datetime.now()}] Retrieved {len(df)} records.")
-            save_snapshot(df)
-        except Exception as e:
-            print("Error fetching or saving data:", e)
-        time.sleep(poll_interval_s)
+        print("⚠️ No data to save (possibly protobuf format).")
 
 
 if __name__ == "__main__":
-    # For one-time run:
-    json_data = fetch_vta_realtime()
-    df = parse_vehicle_data(json_data)
-    print(df.head())
-    # Optionally save a snapshot
-    save_snapshot(df)
-    # Or to run continuously:
-    # main(poll_interval_s=60)
-
+    print("🚏 Collecting real-time VTA transit data...")
+    df = fetch_vta_data()
+    save_vta_data(df)
+    print("✅ Data collection complete.")
