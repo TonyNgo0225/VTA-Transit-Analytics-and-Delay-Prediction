@@ -59,7 +59,7 @@ def fetch_vta_data():
             
             data = response.json()
             df = pd.json_normalize(data.get("entity", []))
-            print(f"✅ Successfully fetched {len(df)} records from VTA API.")
+            print(f"Successfully fetched {len(df)} records from VTA API.")
             return df
 
         else:
@@ -68,14 +68,14 @@ def fetch_vta_data():
             raw_filename = f"data/raw/vta_raw_{timestamp}.pb"
             with open(raw_filename, "wb") as f:
                 f.write(response.content)
-            print(f"💾 Saved raw GTFS-realtime data as {raw_filename}")
+            print(f"Saved raw GTFS-realtime data as {raw_filename}")
             return None
 
     except requests.exceptions.RequestException as e:
-        print(f"❌ Network/API error: {e}")
+        print(f"Network/API error: {e}")
         return None
     except Exception as e:
-        print(f"❌ Unexpected error: {e}")
+        print(f"Unexpected error: {e}")
         return None
 
 
@@ -89,13 +89,13 @@ def save_vta_data(df):
     if df is not None and not df.empty:
         filename = f"data/raw/vta_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
         df.to_csv(filename, index=False)
-        print(f"📁 Data saved to {filename}")
+        print(f"Data saved to {filename}")
     else:
-        print("⚠️ No data to save (possibly protobuf format).")
+        print("No data to save (possibly protobuf format).")
 
 
 if __name__ == "__main__":
-    print("🚏 Collecting real-time VTA transit data...")
+    print("Collecting real-time VTA transit data...")
     df = fetch_vta_data()
     save_vta_data(df)
-    print("✅ Data collection complete.")
+    print("Data collection complete.")
