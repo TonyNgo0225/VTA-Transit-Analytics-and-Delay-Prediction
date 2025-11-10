@@ -22,6 +22,7 @@ import requests
 import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
+from google.transit import gtfs_realtime_pb2
 
 # Load API key from environment variables
 
@@ -35,40 +36,47 @@ os.makedirs("data/raw", exist_ok=True)
 # 511.org provides real time transit data for VTA
 # Documentation: https://511.org/open-data/transit
 
-VTA_API_URL = f"https://api.511.org/transit/vehiclepositions?api_key={VTA_API_KEY}&agency=SCVTA"
+VTA_API_URL = f"http://api.511.org/transit/vehiclepositions?api_key={VTA_API_KEY}&agency=SC"
 
 
 def fetch_vta_data():
     
     """
     Fetches live VTA vehicle position data from the 511.org API.
-    Returns a Pandas DataFrame if JSON data is available, 
-    or saves a binary .pb file if GTFS realtime format is returned.
+    Parses GTFS-realtime protobuf format and returns a Pandas DataFrame.
     """
     
     try:
         response = requests.get(VTA_API_URL, timeout=10)
         response.raise_for_status()
 
-        content_type = response.headers.get("Content-Type", "")
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-        if "application/json" in content_type:
-            
-            # Parse JSON data into a flat table
-            
-            data = response.json()
-            df = pd.json_normalize(data.get("entity", []))
-            print(f"Successfully fetched {len(df)} records from VTA API.")
+        feed = gtfs_realtime_pb2.FeedMessage()
+        feed.ParseFromString(response.content)
+        
+        vehicles = []
+        for entity in feed.entity:
+            if entity.HasField('vehicle'):
+                vehicle = entity.vehicle
+                vehicle_data = {
+                    'timestamp': datetime.now(),
+                    'vehicle_id': vehicle.vehicle.id if vehicle.HasField('vehicle') else None,
+                    'latitude': vehicle.position.latitude if vehicle.HasField('position') else None,
+                    'longitude': vehicle.position.longitude if vehicle.HasField('position') else None,
+                    'bearing': vehicle.position.bearing if vehicle.HasField('position') and vehicle.position.HasField('bearing') else None,
+                    'speed': vehicle.position.speed if vehicle.HasField('position') and vehicle.position.HasField('speed') else None,
+                    'trip_id': vehicle.trip.trip_id if vehicle.HasField('trip') else None,
+                    'route_id': vehicle.trip.route_id if vehicle.HasField('trip') else None,
+                    'stop_id': vehicle.stop_id if vehicle.HasField('stop_id') else None,
+                    'current_status': vehicle.current_status if vehicle.HasField('current_status') else None,
+                }
+                vehicles.append(vehicle_data)
+        
+        if vehicles:
+            df = pd.DataFrame(vehicles)
+            print(f"Successfully fetched {len(df)} vehicle records from VTA API.")
             return df
-
         else:
-            # Save raw GTFS realtime protobuf if JSON is unavailable
-            
-            raw_filename = f"data/raw/vta_raw_{timestamp}.pb"
-            with open(raw_filename, "wb") as f:
-                f.write(response.content)
-            print(f"Saved raw GTFS-realtime data as {raw_filename}")
+            print("No vehicle data found in feed.")
             return None
 
     except requests.exceptions.RequestException as e:
