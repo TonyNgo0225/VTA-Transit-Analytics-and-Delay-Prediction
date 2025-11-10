@@ -1,0 +1,194 @@
+VTA TRANSIT ANALYTICS DASHBOARD - SETUP GUIDE
+==============================================
+
+This guide will walk you through setting up and running the VTA Transit Analytics 
+Dashboard, which predicts bus and light rail delays using real-time transit data 
+and weather information.
+
+==============================================
+PREREQUISITES
+==============================================
+
+1. API Keys Required:
+   - VTA_API_KEY: Get this from 511.org
+     Visit: https://511.org/open-data/token
+     Sign up for a free account and request an API token
+   
+   - OPENWEATHER_API_KEY: Get this from OpenWeatherMap (if using weather data)
+     Visit: https://openweathermap.org/api
+     Sign up for a free account
+
+2. Python 3.11 (already installed in this Replit environment)
+
+3. All dependencies are listed in requirements.txt and are already installed
+
+==============================================
+STEP 1: SET UP API KEYS
+==============================================
+
+You need to add your API keys as environment variables:
+
+1. Click on "Tools" in the left sidebar
+2. Click on "Secrets" 
+3. Add the following secrets:
+   - Key: VTA_API_KEY
+     Value: [Your 511.org API key]
+   
+   - Key: OPENWEATHER_API_KEY (optional, if using weather data)
+     Value: [Your OpenWeatherMap API key]
+
+==============================================
+STEP 2: COLLECT VTA TRANSIT DATA
+==============================================
+
+Run the data collection script to fetch real-time VTA vehicle positions:
+
+Command:
+    python src/collect_vta_data.py
+
+This will:
+- Connect to the 511.org API
+- Download current VTA bus and light rail positions
+- Save the data to data/raw/ folder
+
+Note: You may need to run this multiple times over several hours/days to collect
+enough data for meaningful predictions.
+
+==============================================
+STEP 3: COLLECT WEATHER DATA (OPTIONAL)
+==============================================
+
+If you want to include weather features in your predictions:
+
+Command:
+    python src/collect_weather_data.py
+
+This will fetch weather data from OpenWeatherMap for the VTA service area.
+
+==============================================
+STEP 4: PROCESS AND MERGE DATA
+==============================================
+
+Clean and merge the collected transit and weather data:
+
+Command:
+    python src/clean_merge_data.py
+
+This will:
+- Clean the raw VTA data
+- Merge with weather data (if available)
+- Create processed datasets in data/processed/ folder
+- Generate features for machine learning
+
+==============================================
+STEP 5: TRAIN THE PREDICTION MODEL
+==============================================
+
+Train the Random Forest model to predict delays:
+
+Command:
+    python src/train_model.py
+
+This will:
+- Load the processed dataset
+- Split into training and testing sets
+- Train a Random Forest Regressor
+- Save the trained model to models/ folder
+- Display performance metrics
+
+==============================================
+STEP 6: VIEW THE DASHBOARD
+==============================================
+
+The Streamlit dashboard is already running! You can access it by:
+
+1. Click the "Webview" pane in Replit (opens automatically)
+2. Or click the URL shown at the top of the screen
+
+The dashboard has three sections:
+- Overview: Project description and goals
+- Model Performance: View metrics, predictions, and feature importance
+- Data Preview: Browse the processed dataset
+
+==============================================
+OPTIONAL: EVALUATE MODEL SEPARATELY
+==============================================
+
+To run a detailed model evaluation:
+
+Command:
+    python src/evaluate_model.py
+
+This generates comprehensive performance reports and visualizations.
+
+==============================================
+TROUBLESHOOTING
+==============================================
+
+Problem: Dashboard shows "No model files found"
+Solution: Run step 5 to train the model first
+
+Problem: Dashboard shows "No processed datasets found"  
+Solution: Run steps 2, 3, and 4 to collect and process data
+
+Problem: "Error loading model: KeyError 10"
+Solution: The model was trained with a different Python version. 
+          Delete the .pkl file in models/ and retrain (step 5)
+
+Problem: API request fails with authentication error
+Solution: Check that your API keys are correctly set in Secrets
+
+Problem: Not enough data for training
+Solution: Run the data collection script (step 2) multiple times over 
+          several hours to gather more samples
+
+==============================================
+DATA COLLECTION TIPS
+==============================================
+
+- VTA data changes constantly (buses/trains move), so collect samples at 
+  regular intervals (e.g., every 5-10 minutes)
+  
+- More data = better predictions. Aim for at least 1000+ samples
+
+- Consider setting up a scheduled task to automatically collect data 
+  throughout the day
+
+- Weather conditions change throughout the day and affect delays, so 
+  collecting weather data alongside transit data improves predictions
+
+==============================================
+DEPLOYMENT
+==============================================
+
+Once your dashboard is working, you can publish it:
+
+1. Click "Deploy" in the top right corner
+2. The deployment is already configured for Autoscale
+3. Your dashboard will be live at a public URL
+
+==============================================
+NEXT STEPS
+==============================================
+
+1. Collect initial data (steps 2-3)
+2. Process the data (step 4)  
+3. Train your first model (step 5)
+4. Explore the dashboard to see predictions
+5. Iterate: collect more data and retrain to improve accuracy
+
+For questions or issues, refer to the project documentation in replit.md
+
+==============================================
+PROJECT STRUCTURE
+==============================================
+
+dashboard/        - Streamlit web application
+src/              - Data collection and ML scripts
+data/raw/         - Raw API responses
+data/processed/   - Cleaned and merged datasets
+models/           - Trained ML models
+notebooks/        - Jupyter notebooks for analysis
+database/         - SQLite database and documentation
+
+==============================================
