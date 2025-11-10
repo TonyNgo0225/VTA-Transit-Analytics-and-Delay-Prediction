@@ -97,4 +97,3 @@ if __name__ == "__main__":
     df = parse_weather_data(data)
     save_weather_data(df)
     print("Weather data collection complete.")
-
