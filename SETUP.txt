@@ -21,8 +21,8 @@ Think of it like a weather forecast, but for bus delays!
 
 WHAT YOU'LL NEED
 
-1. A computer with internet
-2. About 30 minutes for initial setup
+1. A computer with internet access.
+2. About 30 minutes for initial setup.
 3. Patience to collect data over a few hours or days (the computer does this, 
    not you - you just need to run it multiple times)
 
