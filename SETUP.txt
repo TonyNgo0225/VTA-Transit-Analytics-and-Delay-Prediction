@@ -1,185 +1,309 @@
-VTA TRANSIT ANALYTICS DASHBOARD - SETUP GUIDE
+VTA TRANSIT ANALYTICS DASHBOARD - COMPLETE BEGINNER'S SETUP GUIDE
 
-This guide will walk you through setting up and running the VTA Transit Analytics 
-Dashboard, which predicts bus and light rail delays using real time transit data 
-and weather information.
+Welcome! This guide will help you set up a dashboard (a visual website) that 
+predicts bus and train delays in the San Jose, California area.
+
+Don't worry if you've never coded before - we'll explain everything step by step!
 
 
-PREREQUISITES
 
-1. API Keys Required:
-   - VTA_API_KEY: Get this from 511.org
-     Visit: https://511.org/open-data/token
-     Sign up for a free account and request an API token
+WHAT IS THIS PROJECT?
+
+This project:
+• Collects real-time information about VTA buses and trains (where they are)
+• Collects weather information (temperature, rain, etc.)
+• Uses that data to predict how delayed buses and trains will be
+• Shows everything on a beautiful interactive website
+
+Think of it like a weather forecast, but for bus delays!
+
+
+
+WHAT YOU'LL NEED
+
+1. A computer with internet
+2. About 30 minutes for initial setup
+3. Patience to collect data over a few hours or days (the computer does this, 
+   not you - you just need to run it multiple times)
+
+
+
+IMPORTANT TERMS EXPLAINED
+
+• Python: A programming language (like English, but for computers)
+• API: A way to ask another website for data
+• API Key: Like a password that lets you access data from websites
+• Terminal/Command Line: A black window where you type commands to tell the 
+  computer what to do
+• Script: A file with instructions for the computer to follow
+• Dashboard: A website that displays information visually
+
+
+
+BEFORE YOU START
+
+You'll need to get two "API Keys" (think of them as permission slips to access 
+data from the internet). These are free!
+
+1. VTA API KEY (Required)
+   This lets you download bus and train location data.
    
-   - OPENWEATHER_API_KEY: Get this from OpenWeatherMap (if using weather data)
-     Visit: https://openweathermap.org/api
-     Sign up for a free account
+   How to get it:
+   a) Go to: https://511.org/open-data/token
+   b) Click "Create Account" or "Sign Up"
+   c) Fill in your email and create a password
+   d) Check your email and click the confirmation link
+   e) Log in to 511.org
+   f) Find the section that says "API Token" or "API Key"
+   g) Copy the long string of letters and numbers - this is your key!
+   h) Save it in a safe place (like a text file on your desktop)
 
-2. Python 3.11 (already installed in this Replit environment)
-
-3. All dependencies are listed in requirements.txt and are already installed
-
-
-STEP 1: SET UP API KEYS
-
-You need to add your API keys as environment variables:
-
-1. Click on "Tools" in the left sidebar
-2. Click on "Secrets" 
-3. Add the following secrets:
-   - Key: VTA_API_KEY
-     Value: [Your 511.org API key]
+2. OPENWEATHER API KEY (Optional but recommended)
+   This lets you download weather data.
    
-   - Key: OPENWEATHER_API_KEY (optional, if using weather data)
-     Value: [Your OpenWeatherMap API key]
-
-
-STEP 2: COLLECT VTA TRANSIT DATA
-
-Run the data collection script to fetch real-time VTA vehicle positions:
-
-Command:
-    python src/collect_vta_data.py
-
-This will:
-- Connect to the 511.org API
-- Download current VTA bus and light rail positions
-- Save the data to data/raw/ folder
-
-Note: You may need to run this multiple times over several hours/days to collect
-enough data for meaningful predictions.
-
-
-STEP 3: COLLECT WEATHER DATA (OPTIONAL)
-
-If you want to include weather features in your predictions:
-
-Command:
-    python src/collect_weather_data.py
-
-This will fetch weather data from OpenWeatherMap for the VTA service area.
-
-
-STEP 4: PROCESS AND MERGE DATA
-
-Clean and merge the collected transit and weather data:
-
-Command:
-    python src/clean_merge_data.py
-
-This will:
-- Clean the raw VTA data
-- Merge with weather data (if available)
-- Create processed datasets in data/processed/ folder
-- Generate features for machine learning
+   How to get it:
+   a) Go to: https://openweathermap.org/api
+   b) Click "Sign Up" in the top right
+   c) Fill in your information and create an account
+   d) Check your email and confirm your account
+   e) Log in, then go to "API keys" section
+   f) You'll see a key already created - copy it!
+   g) Save it in a safe place
 
 
 
-STEP 5: TRAIN THE PREDICTION MODEL
+STEP 1: INSTALL PYTHON
 
-Train the Random Forest model to predict delays:
+Python is the language this project is written in. Your computer needs it 
+installed to run the project.
 
-Command:
-    python src/train_model.py
+FOR WINDOWS:
+1. Go to: https://www.python.org/downloads/
+2. Click the big yellow "Download Python" button
+3. Once downloaded, double-click the installer file
+4. IMPORTANT: Check the box that says "Add Python to PATH" at the bottom!
+5. Click "Install Now"
+6. Wait for it to finish, then click "Close"
 
-This will:
-- Load the processed dataset
-- Split into training and testing sets
-- Train a Random Forest Regressor
-- Save the trained model to models/ folder
-- Display performance metrics
+FOR MAC:
+1. Go to: https://www.python.org/downloads/
+2. Click the big yellow "Download Python" button
+3. Once downloaded, double-click the installer file
+4. Follow the installation wizard (click Continue, Agree, Install)
+5. Enter your password if asked
+6. Click "Close" when done
 
-
-
-STEP 6: VIEW THE DASHBOARD
-
-The Streamlit dashboard is already running! You can access it by:
-
-1. Click the "Webview" pane in Replit (opens automatically)
-2. Or click the URL shown at the top of the screen
-
-The dashboard has three sections:
-- Overview: Project description and goals
-- Model Performance: View metrics, predictions, and feature importance
-- Data Preview: Browse the processed dataset
-
-
-
-OPTIONAL: EVALUATE MODEL SEPARATELY
-
-To run a detailed model evaluation:
-
-Command:
-    python src/evaluate_model.py
-
-This generates comprehensive performance reports and visualizations.
+To check if it worked:
+• Windows: Open "Command Prompt" (search for it in the Start menu)
+• Mac: Open "Terminal" (search for it in Spotlight)
+• Type: python --version
+• Press Enter
+• You should see something like "Python 3.11.x" - that means it worked!
 
 
 
-TROUBLESHOOTING
+STEP 2: DOWNLOAD THIS PROJECT
+
+If you're reading this, you probably already have the project files! 
+
+If not, go to the GitHub page and click the green "Code" button, then 
+"Download ZIP". Extract (unzip) the folder to your Desktop.
+
+
+
+STEP 3: INSTALL REQUIRED PACKAGES
+
+Python needs some extra tools (called "packages") to run this project.
+
+1. Open Terminal (Mac) or Command Prompt (Windows)
+
+2. Navigate to the project folder:
+   Type: cd Desktop/VTA-Transit-Analytics-and-Delay-Prediction
+   (Adjust this path if you put the folder somewhere else)
+   Press Enter
+
+3. Install the packages:
+   Type: pip install -r requirements.txt
+   Press Enter
+   
+4. Wait a few minutes - you'll see lots of text scrolling. That's normal!
+   When it says "Successfully installed..." you're done!
+
+
+
+STEP 4: ADD YOUR API KEYS
+
+Now we need to tell the project about your API keys (the permission slips you 
+got earlier).
+
+1. In the project folder, create a new file called ".env"
+   
+   How to create .env file:
+   • Windows: Right-click in the folder → New → Text Document
+     Rename it from "New Text Document.txt" to ".env"
+     (You might need to enable "File name extensions" in File Explorer)
+   
+   • Mac: Open TextEdit → New Document → Format menu → Make Plain Text
+     Save it as ".env" in the project folder
+
+2. Open the .env file with a text editor (Notepad on Windows, TextEdit on Mac)
+
+3. Type these two lines EXACTLY, replacing the text after = with YOUR keys:
+   
+   VTA_API_KEY=paste_your_511_org_key_here
+   OPENWEATHER_API_KEY=paste_your_openweather_key_here
+
+   Example:
+   VTA_API_KEY=abc123xyz789
+   OPENWEATHER_API_KEY=def456uvw012
+
+4. Save the file and close it
+
+
+
+STEP 5: COLLECT BUS AND TRAIN DATA
+
+Now the fun part! We're going to collect real data about buses and trains.
+
+1. Make sure Terminal/Command Prompt is still open in your project folder
+   (If you closed it, go back to Step 3 and do step 2 again)
+
+2. Type this command:
+   python src/collect_vta_data.py
+   
+3. Press Enter
+
+4. You should see messages like "Collecting data..." and "Data saved!"
+   If you see an error about API keys, go back and check Step 4
+
+5. IMPORTANT: This only collects data for RIGHT NOW (one snapshot in time).
+   To build a good prediction model, you need lots of snapshots!
+   
+   How to collect more data:
+   • Run the same command again every 10-15 minutes
+   • Do this several times throughout the day
+   • The more data you collect, the better your predictions will be
+   • Aim to collect at least 50-100 snapshots (over several days is best)
+
+
+
+STEP 6: COLLECT WEATHER DATA (OPTIONAL)
+
+Weather affects delays! This step is optional but makes predictions better.
+
+1. In Terminal/Command Prompt, type:
+   python src/collect_weather_data.py
+
+2. Press Enter
+
+3. This also just captures one moment in time, so run it multiple times
+   (ideally at the same time you run the bus/train data collection)
+
+
+
+STEP 7: PROCESS THE DATA
+
+Now we need to "clean" the data (remove errors, combine everything together).
+
+1. In Terminal/Command Prompt, type:
+   python src/clean_merge_data.py
+
+2. Press Enter
+
+3. You'll see messages about cleaning and merging data
+
+4. When it says "Processing complete!" you're done!
+
+
+
+STEP 8: TRAIN THE PREDICTION MODEL
+
+This is where the magic happens! The computer will learn patterns from your 
+data to predict delays.
+
+1. In Terminal/Command Prompt, type:
+   python src/train_model.py
+
+2. Press Enter
+
+3. You'll see numbers and statistics - these tell you how accurate the 
+   predictions are
+
+4. When it finishes, the computer has "learned" how to predict delays!
+
+
+
+STEP 9: VIEW YOUR DASHBOARD!
+
+Finally, let's see everything on a beautiful website!
+
+1. In Terminal/Command Prompt, type:
+   streamlit run dashboard/app.py
+
+2. Press Enter
+
+3. Your web browser should automatically open showing your dashboard!
+   If it doesn't, look in Terminal/Command Prompt for a message like:
+   "Local URL: http://localhost:8501"
+   Copy that URL and paste it in your web browser
+
+4. Explore the dashboard:
+   • Overview: Learn about the project
+   • Model Performance: See how accurate your predictions are
+   • Data Preview: Browse the data you collected
+
+5. To stop the dashboard: Go back to Terminal/Command Prompt and press 
+   Ctrl+C (both Windows and Mac)
+
+
+
+HELP! SOMETHING WENT WRONG
+
+Problem: "Python is not recognized" or "command not found"
+Solution: Python isn't installed correctly. Go back to Step 1 and make sure 
+         you checked "Add Python to PATH" during installation
+
+Problem: "No module named 'streamlit'" or similar
+Solution: The packages didn't install. Go back to Step 3
 
 Problem: Dashboard shows "No model files found"
-Solution: Run step 5 to train the model first
+Solution: You haven't trained the model yet. Do Step 8
 
-Problem: Dashboard shows "No processed datasets found"  
-Solution: Run steps 2, 3, and 4 to collect and process data
+Problem: "API authentication failed"
+Solution: Your API keys aren't working. Check that you:
+         • Copied them correctly (no extra spaces)
+         • Put them in the .env file correctly
+         • The keys are activated (sometimes OpenWeather takes an hour to activate)
 
-Problem: "Error loading model: KeyError 10"
-Solution: The model was trained with a different Python version. 
-          Delete the .pkl file in models/ and retrain (step 5)
-
-Problem: API request fails with authentication error
-Solution: Check that your API keys are correctly set in Secrets
-
-Problem: Not enough data for training
-Solution: Run the data collection script (step 2) multiple times over 
-          several hours to gather more samples
+Problem: "Not enough data for training"
+Solution: You need to collect more data. Go back to Step 5 and run it more 
+         times. You need at least 50-100 data points
 
 
 
-DATA COLLECTION TIPS
+TIPS FOR SUCCESS
 
-- VTA data changes constantly (buses/trains move), so collect samples at 
-  regular intervals (e.g., every 5-10 minutes)
-  
-- More data = better predictions. Aim for at least 1000+ samples
+1. Be patient with data collection
+   • Collect data at different times of day (morning rush, lunch, evening)
+   • Collect on different days of the week (weekdays vs weekends)
+   • More data = better predictions
 
-- Consider setting up a scheduled task to automatically collect data 
-  throughout the day
+2. Run collection automatically (Advanced)
+   • On Windows: Use Task Scheduler
+   • On Mac: Use cron jobs or Automator
+   • Google "schedule Python script [your operating system]" for tutorials
 
-- Weather conditions change throughout the day and affect delays, so 
-  collecting weather data alongside transit data improves predictions
-
-
-
-DEPLOYMENT
-
-Once your dashboard is working, you can publish it:
-
-1. Click "Deploy" in the top right corner
-2. The deployment is already configured for Autoscale
-3. Your dashboard will be live at a public URL
+3. Update your data regularly
+   • Once you have initial predictions, keep collecting more data
+   • Re-run Step 7 (process data) and Step 8 (train model) with new data
+   • Your predictions will get better over time!
 
 
-NEXT STEPS
+WHAT'S IN EACH FOLDER?
 
-1. Collect initial data (steps 2-3)
-2. Process the data (step 4)  
-3. Train your first model (step 5)
-4. Explore the dashboard to see predictions
-5. Iterate: collect more data and retrain to improve accuracy
-
-For questions or issues, refer to the project documentation in replit.md
-
-
-PROJECT STRUCTURE
-
-dashboard/        - Streamlit web application
-src/              - Data collection and ML scripts
-data/raw/         - Raw API responses
-data/processed/   - Cleaned and merged datasets
-models/           - Trained ML models
-notebooks/        - Jupyter notebooks for analysis
-database/         - SQLite database and documentation
-
+dashboard/        → The visual website files
+src/              → The Python scripts you run
+data/raw/         → Where raw data from APIs gets saved
+data/processed/   → Where cleaned data gets saved
+models/           → Where the trained prediction model gets saved
+notebooks/        → Advanced: Jupyter notebooks for data analysis
