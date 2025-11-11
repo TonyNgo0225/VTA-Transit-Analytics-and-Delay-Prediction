@@ -7,3 +7,16 @@ matplotlib>=3.7.0
 requests>=2.31.0
 python-dotenv>=1.0.0
 gtfs-realtime-bindings>=1.0.0
+streamlit-folium>=0.15.0
+folium>=0.14.0
+folium
+gtfs-realtime-bindings
+joblib
+matplotlib
+numpy
+pandas
+python-dotenv
+requests
+scikit-learn
+streamlit
+streamlit-folium
