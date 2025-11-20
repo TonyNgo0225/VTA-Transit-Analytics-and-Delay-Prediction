@@ -106,11 +106,11 @@ A browser window should open automatically. If not, go to:
 
 Once the dashboard is running, you can:
 
-  **View Overview**   See summary statistics about current buses and delays
-  **Check Predictions**   Understand how accurate our delay predictions are
-  **Explore Data**   Look at the raw data we collected
-  **See Maps**   Visualize bus locations on a map of San Jose
-  **Analyze Patterns**   Understand how weather affects delays
+  -**View Overview**   See summary statistics about current buses and delays
+  -**Check Predictions**   Understand how accurate our delay predictions are
+  -**Explore Data**   Look at the raw data we collected
+  -**See Maps**   Visualize bus locations on a map of San Jose
+  -**Analyze Patterns**   Understand how weather affects delays
 
 ## Running Regular Updates
 
