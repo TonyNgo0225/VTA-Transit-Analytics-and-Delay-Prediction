@@ -5,10 +5,10 @@
 This is a tool that helps predict how late buses and light rail trains in San Jose will be based on real time traffic conditions and weather. It works by collecting data about where buses are right now, checking the weather, and using that information to predict delays. Think of it like a weather forecast, but for bus delays instead of rain.
 
 This project helps predict delays by:
-  Watching bus and train locations in real time
-  Checking current weather conditions
-  Using smart predictions to estimate how many minutes late each bus will be
-  Showing you all this information on an easy to use dashboard
+  - Watching bus and train locations in real time
+  - Checking current weather conditions
+  - Using smart predictions to estimate how many minutes late each bus will be
+  - Showing you all this information on an easy to use dashboard
 
 ## How Does It Work?
 
