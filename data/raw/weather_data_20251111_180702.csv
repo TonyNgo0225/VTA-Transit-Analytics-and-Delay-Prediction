@@ -1,0 +1,2 @@
+city,timestamp,temp,feels_like,humidity,pressure,wind_speed,weather_main,weather_description
+San Jose,2025-11-11 18:07:02.903564,18.5,17.8,65,1013,3.5,Clear,clear sky

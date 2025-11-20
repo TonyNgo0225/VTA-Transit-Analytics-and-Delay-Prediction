@@ -1,0 +1,1 @@
+trip_id,route_id,latitude,longitude,timestamp_vta,timestamp_rounded,timestamp_weather,temp,humidity,pressure,wind_speed,weather_main
